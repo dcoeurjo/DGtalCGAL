@@ -119,7 +119,6 @@ processShape( const std::string & name,
     trace.info() << "Filename = "<<namePCLFile<<std::endl;
     PCL.open( namePCLFile.c_str() );
 
-
       
     //Count the number of points
     long int cpt=0;
