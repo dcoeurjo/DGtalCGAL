@@ -62,12 +62,7 @@ namespace DGtal
    * Description of template class 'MongeJetFittingCurvatureEstimator' <p>
    * \brief Aim: Estimates curvature using CGAL Jet Fitting and Monge Form.
    *
-   *
-   * @tparam TConstIteratorOnPoints type of iterator on points used as
-   * query points.
-   * @tparam TParametricShape type of the parametric shape.
-   * @tparam TParametricShapeFunctor type of Functor used to evaluate
-   * the quantity.
+   * model of CLocal
    */
   template <typename TSurfel, typename TEmbedder>
   class MongeJetFittingCurvatureEstimator
@@ -117,7 +112,10 @@ namespace DGtal
         std::cout << monge_fit.pca_basis(i).first << std::endl
                   << monge_fit.pca_basis(i).second  << std::endl;
       
-      return 0;
+      double k1 = monge_form.principal_curvatures ( 0 );
+      double k2 = monge_form.principal_curvatures ( 1 );
+      //Gaussian curvature 
+      return k1*k2;
     }
     
     
