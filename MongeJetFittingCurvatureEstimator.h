@@ -69,144 +69,77 @@ namespace DGtal
    * @tparam TParametricShapeFunctor type of Functor used to evaluate
    * the quantity.
    */
-  template <typename TKSpace, typename TShapeFunctor>
+  template <typename TSurfel, typename TEmbedder>
   class MongeJetFittingCurvatureEstimator
   {
   public:
-    typedef TKSpace KSpace;
-    typedef typename Z3i::Domain Domain;
-    typedef typename KSpace::Space::RealPoint RealPoint;
-    typedef typename KSpace::SCell Cell;
 
-    typedef TShapeFunctor ShapeCellFunctor;
-
-    
+    typedef TSurfel Surfel;
+    typedef TEmbedder SCellEmbedder;  
     typedef double Quantity;
-    
-    typedef CGAL::Cartesian<Quantity> CGALKernel;
+    typedef typename SCellEmbedder::RealPoint RealPoint;
+
+    typedef CGAL::Cartesian<double> CGALKernel;
     typedef CGALKernel::Point_3  CGALPoint;
     typedef CGAL::Monge_via_jet_fitting<CGALKernel>  CGALMongeViaJet;
     typedef CGALMongeViaJet::Monge_form CGALMongeForm;
+
+
+    MongeJetFittingCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder):
+      myEmbedder(anEmbedder) {};
+
     
+    void pushSurfel(const Surfel & aSurf)
+    {
+      RealPoint p = myEmbedder->operator()(aSurf);
+      trace.info()<<" Got = "<<p<<std::endl;
+      CGALPoint pp(p[0],p[1],p[2]);
+      myPoints.push_back(pp);
+    }
+    
+    
+    Quantity eval(const double h)
+    {
+      CGALMongeForm monge_form;
+      CGALMongeViaJet monge_fit;
+      
+      trace.info() << "Fitting..."<<std::endl;
+      
+      monge_form = monge_fit(myPoints.begin() , myPoints.end(), 4, 4); 
+      
+      //OUTPUT on std::cout
+      CGAL::set_pretty_mode(std::cout);
+      std::cout << "number of points used : " << myPoints.size() << std::endl
+                << monge_form;
+      std::cout  << "condition_number : " << monge_fit.condition_number() << std::endl
+                 << "pca_eigen_vals and associated pca_eigen_vecs :"  << std::endl;
+      for (int i=0; i<3; i++)
+        std::cout << monge_fit.pca_basis(i).first << std::endl
+                  << monge_fit.pca_basis(i).second  << std::endl;
+      
+      return 0;
+    }
+    
+    
+    void reset()
+    {
+      myPoints.clear();
+    }
     
 
-    // ----------------------- Standard services ------------------------------
-  public:
-
-    /**
-     * Constructor.
-     *
-     * @param space space in which the shape is defined.
-     * @param f functor on cell of the shape.
-     */
-    MongeJetFittingCurvatureEstimator (ConstAlias<KSpace>  space,
-                                       ConstAlias<ShapeCellFunctor> aShape );
-    
-    /**
-     * Destructor.
-     */
-    ~MongeJetFittingCurvatureEstimator()
-    {}
-    
-    // ----------------------- Interface --------------------------------------
-  public:
-    
-    /**
-     * Initialise the MongeJetFittingCurvatureEstimator with a specific Euclidean kernel radius re, and grid step h.
-     *
-     * @param _h precision of the grid
-     *
-     * @bug known bug with radius of kernel. Small hack for the moment.
-     */
-    template< typename ConstIteratorOnCells >
-    void init ( const double _h, ConstIteratorOnCells &itb, ConstIteratorOnCells &ite);
-    
-    /**
-     * Compute the integral invariant mean curvature to cell *it of a shape.
-     *
-     * @tparam ConstIteratorOnCells iterator on a Cell
-     *
-     * @param it iterator of a cell (from a shape) we want compute the integral invariant curvature.
-     *
-     * @return quantity of the result of Integral Invariant estimator at position *it
-     */
-    template< typename ConstIteratorOnCells >
-    Quantity eval ( const ConstIteratorOnCells & it );
-    
-    /**
-     * Compute the integral invariant mean curvature from two cells (from *itb to *ite (exclude) ) of a shape.
-     * Return the result on an OutputIterator (param).
-     *
-     * @tparam ConstIteratorOnCells iterator on a Cell
-     * @tparam OutputIterator Output iterator type
-     *
-     * @param ite iterator of the begin position on the shape where we compute the integral invariant curvature.
-     * @param itb iterator of the end position (excluded) on the shape where we compute the integral invariant curvature.
-     * @param result iterator of the result of the computation.
-     */
-    template< typename ConstIteratorOnCells, typename OutputIterator >
-    void eval ( const ConstIteratorOnCells & itb,
-                const ConstIteratorOnCells & ite,
-                OutputIterator & result );
-    
-    
-    /**
-     * Checks the validity/consistency of the object.
-     * @return 'true' if the object is valid, 'false' otherwise.
-     */
-    bool isValid() const;
-
-    // ------------------------- Protected Datas ------------------------------
-  protected:
-
-    // ------------------------- Private Datas --------------------------------
-  private:
-
-   
-    //Copy of the KSpace
-    KSpace *mySpace;
-    
-    ///Grid size
-    double myH; 
-    
-    /// origin spel of the kernel support.
-    Cell myOrigin;
-    
-
-    ///Aliased Shape
-    ShapeCellFunctor *myShape;
-    
-    ///Explicit point set surface
-    std::vector<CGALPoint> myPointSet;
-    
-    
-    // ------------------------- Hidden services ------------------------------
   private:
     
-    /**
-     * Copy constructor.
-     * @param other the object to clone.
-     * Forbidden by default.
-     */
-    MongeJetFittingCurvatureEstimator<KSpace,ShapeCellFunctor> ( const MongeJetFittingCurvatureEstimator<KSpace,ShapeCellFunctor> & other );
+    const SCellEmbedder * myEmbedder;
 
-    /**
-     * Assignment.
-     * @param other the object to copy.
-     * @return a reference on 'this'.
-     * Forbidden by default.
-     */
-    MongeJetFittingCurvatureEstimator<KSpace,ShapeCellFunctor> & operator= ( const MongeJetFittingCurvatureEstimator<KSpace,ShapeCellFunctor> & other );
+    std::vector<CGALPoint> myPoints;
 
+    
+    
 
   }; // end of class MongeJetFittingCurvatureEstimator
 
 } // namespace DGtal
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Includes inline functions.
-#include "MongeJetFittingCurvatureEstimator.ih"
 
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////

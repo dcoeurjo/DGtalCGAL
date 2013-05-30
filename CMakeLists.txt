@@ -13,7 +13,7 @@ if ( COMMAND cmake_policy )
 endif()
 
 
-find_package(CGAL COMPONENTS Core )
+find_package(CGAL COMPONENTS Core Eigen3)
 include( ${CGAL_USE_FILE} )
 
 
@@ -30,6 +30,8 @@ add_custom_target(_headers SOURCES ${DGTAL_MYHEADERS})
 
 SET(DGTAL_TOOLS_SRC
   implicitToPCL
+  testLocalEstimatorFromFunctorAdapter
+  testMonge
   #curvatureFromImplicit
 )
 
