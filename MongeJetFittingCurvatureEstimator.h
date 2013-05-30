@@ -83,7 +83,8 @@ namespace DGtal
     MongeJetFittingCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder):
       myEmbedder(anEmbedder) {};
 
-    
+
+    //We explicitely store the surfel embedding
     void pushSurfel(const Surfel & aSurf)
     {
       RealPoint p = myEmbedder->operator()(aSurf);
@@ -92,7 +93,7 @@ namespace DGtal
       myPoints.push_back(pp);
     }
     
-    
+    //Jet fitting and Monge form evaluation
     Quantity eval(const double h)
     {
       CGALMongeForm monge_form;
