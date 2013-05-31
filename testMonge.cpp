@@ -44,7 +44,8 @@
 #include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
 #include "DGtal/geometry/surfaces/estimation/BasicEstimatorFromSurfelsFunctors.h"
 #include "DGtal/topology/LightImplicitDigitalSurface.h"
-#include "MongeJetFittingCurvatureEstimator.h"
+#include "MongeJetFittingGaussianCurvatureEstimator.h"
+#include "MongeJetFittingMeanCurvatureEstimator.h"
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -105,26 +106,29 @@ bool testLocalEstimatorFromFunctorAdapter()
   Surfel bel = Surfaces<KSpace>::findABel( K, ellipse, 10000 );
   Surface surface( K, ellipse,
                     SurfelAdjacency<KSpace::dimension>( true ), bel );
-  unsigned int nbsurfels = 0;
-  for ( ConstIterator it = surface.begin(), it_end = surface.end();
-       it != it_end; ++it )
-  {
-    ++nbsurfels;
-  }
-  trace.info() << nbsurfels << " surfels found." << std::endl;
   trace.endBlock();
   
   trace.beginBlock("Creating  adapter");
-  typedef MongeJetFittingCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > Functor;
-  typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, Functor> Reporter;
+  typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
+  typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
+  typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorGaussian> ReporterK;
+  typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorMean> ReporterH;
   
-  Functor estimator(CanonicSCellEmbedder<KSpace>(surface.space()));
+  FunctorGaussian estimatorK(CanonicSCellEmbedder<KSpace>(surface.space()));
+  FunctorMean estimatorH(CanonicSCellEmbedder<KSpace>(surface.space()));
                     
-  Reporter reporter(surface, l2Metric, estimator);
+  ReporterK reporterK(surface, l2Metric, estimatorK);
+  ReporterH reporterH(surface, l2Metric, estimatorH);
   
-  reporter.init(1, 5);
-  Functor::Quantity val = reporter.eval( surface.begin());
-  trace.info() <<  "Value = "<<val << std::endl;
+  reporterK.init(1, 5);
+  reporterH.init(1, 5);
+
+  FunctorGaussian::Quantity valK = reporterK.eval( surface.begin());
+  FunctorMean::Quantity valH = reporterH.eval( surface.begin());
+
+
+  trace.info() << "Gaussian = "<<valK <<std::endl;
+  trace.info() << "Mean = "<<valH<< std::endl;
   trace.endBlock();
   trace.endBlock();
   

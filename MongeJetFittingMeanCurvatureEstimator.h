@@ -17,29 +17,29 @@
 #pragma once
 
 /**
- * @file MongeJetFittingCurvatureEstimator.h
+ * @file MongeJetFittingMeanCurvatureEstimator.h
  * @brief Computes the true quantity to each element of a range associated to a parametric shape.
  * @author David Coeurjolly (\c david.coeurjolly@liris.cnrs.fr )
  * Laboratoire d'InfoRmatique en Image et Systèmes d'information - LIRIS (CNRS, UMR 5205), CNRS, France
  *
  * @date 2011/06/27
  *
- * Header file for module MongeJetFittingCurvatureEstimator.cpp
+ * Header file for module MongeJetFittingMeanCurvatureEstimator.cpp
  *
  * This file is part of the DGtal library.
  *
  * @see testLengthEstimators.cpp, testTrueLocalEstimator.cpp
  */
 
-#if defined(MongeJetFittingCurvatureEstimator_RECURSES)
-#error Recursive header files inclusion detected in MongeJetFittingCurvatureEstimator.h
-#else // defined(MongeJetFittingCurvatureEstimator_RECURSES)
+#if defined(MongeJetFittingMeanCurvatureEstimator_RECURSES)
+#error Recursive header files inclusion detected in MongeJetFittingMeanCurvatureEstimator.h
+#else // defined(MongeJetFittingMeanCurvatureEstimator_RECURSES)
 /** Prevents recursive inclusion of headers. */
-#define MongeJetFittingCurvatureEstimator_RECURSES
+#define MongeJetFittingMeanCurvatureEstimator_RECURSES
 
-#if !defined MongeJetFittingCurvatureEstimator_h
+#if !defined MongeJetFittingMeanCurvatureEstimator_h
 /** Prevents repeated inclusion of headers. */
-#define MongeJetFittingCurvatureEstimator_h
+#define MongeJetFittingMeanCurvatureEstimator_h
 
 //////////////////////////////////////////////////////////////////////////////
 // Inclusions
@@ -57,15 +57,15 @@
 namespace DGtal
 {
   /////////////////////////////////////////////////////////////////////////////
-  // template class MongeJetFittingCurvatureEstimator
+  // template class MongeJetFittingMeanCurvatureEstimator
   /**
-   * Description of template class 'MongeJetFittingCurvatureEstimator' <p>
+   * Description of template class 'MongeJetFittingMeanCurvatureEstimator' <p>
    * \brief Aim: Estimates curvature using CGAL Jet Fitting and Monge Form.
    *
    * model of CLocal
    */
   template <typename TSurfel, typename TEmbedder>
-  class MongeJetFittingCurvatureEstimator
+  class MongeJetFittingMeanCurvatureEstimator
   {
   public:
 
@@ -80,7 +80,7 @@ namespace DGtal
     typedef CGALMongeViaJet::Monge_form CGALMongeForm;
 
 
-    MongeJetFittingCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder):
+    MongeJetFittingMeanCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder):
       myEmbedder(anEmbedder) {};
 
 
@@ -88,7 +88,7 @@ namespace DGtal
     void pushSurfel(const Surfel & aSurf)
     {
       RealPoint p = myEmbedder->operator()(aSurf);
-      trace.info()<<" Got = "<<p<<std::endl;
+      // trace.info()<<" Got = "<<p<<std::endl;
       CGALPoint pp(p[0],p[1],p[2]);
       myPoints.push_back(pp);
     }
@@ -99,12 +99,12 @@ namespace DGtal
       CGALMongeForm monge_form;
       CGALMongeViaJet monge_fit;
       
-      trace.info() << "Fitting..."<<std::endl;
+      //  trace.info() << "Fitting..."<<std::endl;
       
       monge_form = monge_fit(myPoints.begin() , myPoints.end(), 4, 4); 
       
       //OUTPUT on std::cout
-      CGAL::set_pretty_mode(std::cout);
+      /*CGAL::set_pretty_mode(std::cout);
       std::cout << "number of points used : " << myPoints.size() << std::endl
                 << monge_form;
       std::cout  << "condition_number : " << monge_fit.condition_number() << std::endl
@@ -113,10 +113,11 @@ namespace DGtal
         std::cout << monge_fit.pca_basis(i).first << std::endl
                   << monge_fit.pca_basis(i).second  << std::endl;
       
+      */
+
       double k1 = monge_form.principal_curvatures ( 0 );
       double k2 = monge_form.principal_curvatures ( 1 );
-      //Gaussian curvature 
-      return k1*k2;
+      return 0.5*(k1+k2);
     }
     
     
@@ -135,7 +136,7 @@ namespace DGtal
     
     
 
-  }; // end of class MongeJetFittingCurvatureEstimator
+  }; // end of class MongeJetFittingMeanCurvatureEstimator
 
 } // namespace DGtal
 
@@ -143,7 +144,7 @@ namespace DGtal
 //                                                                           //
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif // !defined MongeJetFittingCurvatureEstimator_h
+#endif // !defined MongeJetFittingMeanCurvatureEstimator_h
 
-#undef MongeJetFittingCurvatureEstimator_RECURSES
-#endif // else defined(MongeJetFittingCurvatureEstimator_RECURSES)
+#undef MongeJetFittingMeanCurvatureEstimator_RECURSES
+#endif // else defined(MongeJetFittingMeanCurvatureEstimator_RECURSES)
