@@ -105,7 +105,7 @@ namespace DGtal
     }
     
     /** 
-     * Evaluate the curvature from Monge form.
+     * Evaluate the normal vector from Monge form.
      * 
      * @param h gridstep
      * 
