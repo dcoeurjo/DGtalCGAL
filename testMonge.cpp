@@ -47,6 +47,7 @@
 #include "MongeJetFittingGaussianCurvatureEstimator.h"
 #include "MongeJetFittingMeanCurvatureEstimator.h"
 #include "MongeJetFittingNormalVectorEstimator.h"
+#include "LinearLeastSquareFittingNormalVectorEstimator.h"
 ///////////////////////////////////////////////////////////////////////////////
 
 using namespace std;
@@ -113,31 +114,38 @@ bool testLocalEstimatorFromFunctorAdapter()
   typedef MongeJetFittingGaussianCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorGaussian;
   typedef MongeJetFittingMeanCurvatureEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorMean;
   typedef MongeJetFittingNormalVectorEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorNormal;
+  typedef LinearLeastSquareFittingNormalVectorEstimator<Surfel, CanonicSCellEmbedder<KSpace> > FunctorNormalLeast;
   
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorGaussian> ReporterK;
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorMean> ReporterH;
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorNormal> ReporterNormal;
+  typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorNormalLeast> ReporterNormalLeast;
   
   FunctorGaussian estimatorK(CanonicSCellEmbedder<KSpace>(surface.space()));
   FunctorMean estimatorH(CanonicSCellEmbedder<KSpace>(surface.space()));
   FunctorNormal estimatorN(CanonicSCellEmbedder<KSpace>(surface.space()));
+  FunctorNormalLeast estimatorL(CanonicSCellEmbedder<KSpace>(surface.space()));
                     
   ReporterK reporterK(surface, l2Metric, estimatorK);
   ReporterH reporterH(surface, l2Metric, estimatorH);
   ReporterNormal reporterN(surface, l2Metric, estimatorN);
+  ReporterNormalLeast reporterL(surface, l2Metric, estimatorL);
   
   reporterK.init(1, 5);
   reporterH.init(1, 5);
   reporterN.init(1, 5);
+  reporterL.init(1, 5);
 
   FunctorGaussian::Quantity valK = reporterK.eval( surface.begin());
   FunctorMean::Quantity valH = reporterH.eval( surface.begin());
   FunctorNormal::Quantity valN = reporterN.eval( surface.begin());
+  FunctorNormalLeast::Quantity valL = reporterL.eval( surface.begin());
 
 
   trace.info() << "Gaussian = "<<valK <<std::endl;
   trace.info() << "Mean = "<<valH<< std::endl;
-  trace.info() << "Normal Vector = "<<valN<< std::endl;
+  trace.info() << "Normal Vector (from Monge form) = "<<valN<< std::endl;
+  trace.info() << "Normal Vector (linear least square) = "<<valN<< std::endl;
 
   trace.endBlock();
   trace.endBlock();
