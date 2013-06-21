@@ -16,10 +16,10 @@ do
 
 
     echo "Computing Stats..."
-    statisticsEstimators CurvatureCircle_$myH.txt 5 9 | tail -1 >> ErrorMongeMean.txt
-    Statisticsestimators CurvatureCircle_$myH.txt 6 10 | tail -1 >> ErrorMongeGaussian.txt
-    statisticsEstimators CurvatureCircle_$myH.txt 5 7 | tail -1 >> ErrorIIMean.txt
-    statisticsEstimators CurvatureCircle_$myH.txt 6 8 | tail -1 >> ErrorIIGaussian.txt
+    statisticsEstimators CurvatureCircle_$myH.txt 4 8 | tail -1 >> ErrorMongeMean.txt
+    Statisticsestimators CurvatureCircle_$myH.txt 5 9 | tail -1 >> ErrorMongeGaussian.txt
+    statisticsEstimators CurvatureCircle_$myH.txt 4 6 | tail -1 >> ErrorIIMean.txt
+    statisticsEstimators CurvatureCircle_$myH.txt 5 7 | tail -1 >> ErrorIIGaussian.txt
 
     ### Crappy but it's just to get first results
     let "myH=$myH - 0.1"
