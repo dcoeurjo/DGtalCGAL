@@ -32,6 +32,8 @@ SET(DGTAL_TOOLS_SRC
   implicitToPCL
   testLocalEstimatorFromFunctorAdapter
   testMonge
+  3dLocalEstimators
+  statisticsEstimators
   #curvatureFromImplicit
 )
 

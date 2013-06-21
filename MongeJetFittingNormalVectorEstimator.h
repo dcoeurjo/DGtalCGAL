@@ -84,10 +84,11 @@ namespace DGtal
      * Constructor.
      * 
      * @param anEmbedder embedder to map surfel to R^n.
+     * @param h grid step
      * @param d degree of the polynomial surface to fit.
      */
-    MongeJetFittingNormalVectorEstimator(ConstAlias<SCellEmbedder> anEmbedder, unsigned int d = 4):
-      myEmbedder(anEmbedder), myD(d) 
+    MongeJetFittingNormalVectorEstimator(ConstAlias<SCellEmbedder> anEmbedder, const double h, unsigned int d = 4):
+      myEmbedder(anEmbedder), myH(h), myD(d) 
     {
       VERIFY_MSG(d>=2,"Polynomial surface degree must be greater than 2");
     }
@@ -100,18 +101,16 @@ namespace DGtal
     void pushSurfel(const Surfel & aSurf)
     {
       RealPoint p = myEmbedder->operator()(aSurf);
-      CGALPoint pp(p[0],p[1],p[2]);
+      CGALPoint pp(p[0]*myH,p[1]*myH,p[2]*myH);
       myPoints.push_back(pp);
     }
     
     /** 
      * Evaluate the normal vector from Monge form.
      * 
-     * @param h gridstep
-     * 
      * @return the mean curvature
      */    
-    Quantity eval(const double h)
+    Quantity eval( )
     {
       CGALMongeForm monge_form;
       CGALMongeViaJet monge_fit;
@@ -144,6 +143,8 @@ namespace DGtal
     ///Degree of the polynomial surface to fit
     unsigned int myD;
     
+    //Grid step
+    double myH;
     
 
   }; // end of class MongeJetFittingNormalVectorEstimator

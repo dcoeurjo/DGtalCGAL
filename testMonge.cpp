@@ -37,8 +37,7 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/shapes/Shapes.h"
-#include "DGtal/kernel/CanonicEmbedder.h"
-#include "DGtal/kernel/CanonicSCellEmbedder.h"
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 #include "DGtal/graph/DistanceBreadthFirstVisitor.h"
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
@@ -121,10 +120,10 @@ bool testLocalEstimatorFromFunctorAdapter()
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorNormal> ReporterNormal;
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, FunctorNormalLeast> ReporterNormalLeast;
   
-  FunctorGaussian estimatorK(CanonicSCellEmbedder<KSpace>(surface.space()));
-  FunctorMean estimatorH(CanonicSCellEmbedder<KSpace>(surface.space()));
-  FunctorNormal estimatorN(CanonicSCellEmbedder<KSpace>(surface.space()));
-  FunctorNormalLeast estimatorL(CanonicSCellEmbedder<KSpace>(surface.space()));
+  FunctorGaussian estimatorK(CanonicSCellEmbedder<KSpace>(surface.space()),1);
+  FunctorMean estimatorH(CanonicSCellEmbedder<KSpace>(surface.space()), 1);
+  FunctorNormal estimatorN(CanonicSCellEmbedder<KSpace>(surface.space()),1);
+  FunctorNormalLeast estimatorL(CanonicSCellEmbedder<KSpace>(surface.space()),1);
                     
   ReporterK reporterK(surface, l2Metric, estimatorK);
   ReporterH reporterH(surface, l2Metric, estimatorH);

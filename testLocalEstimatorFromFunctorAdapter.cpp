@@ -37,8 +37,7 @@
 #include "DGtal/io/Color.h"
 #include "DGtal/io/colormaps/GradientColorMap.h"
 #include "DGtal/shapes/Shapes.h"
-#include "DGtal/kernel/CanonicEmbedder.h"
-#include "DGtal/kernel/CanonicSCellEmbedder.h"
+#include "DGtal/topology/CanonicSCellEmbedder.h"
 #include "DGtal/graph/DistanceBreadthFirstVisitor.h"
 #include "DGtal/geometry/volumes/distance/ExactPredicateLpSeparableMetric.h"
 #include "DGtal/geometry/surfaces/estimation/LocalEstimatorFromSurfelFunctorAdapter.h"
@@ -117,7 +116,7 @@ bool testLocalEstimatorFromFunctorAdapter()
   typedef DummyEstimatorFromSurfels<Surfel, CanonicSCellEmbedder<KSpace> > Functor;
   typedef LocalEstimatorFromSurfelFunctorAdapter<Surface, Z3i::L2Metric, Functor> Reporter;
   
-  Functor estimator(CanonicSCellEmbedder<KSpace>(surface.space()));
+  Functor estimator(CanonicSCellEmbedder<KSpace>(surface.space()), 1);
                     
   Reporter reporter(surface, l2Metric, estimator);
   

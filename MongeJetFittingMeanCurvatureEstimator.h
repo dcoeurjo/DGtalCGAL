@@ -60,7 +60,19 @@ namespace DGtal
   // template class MongeJetFittingMeanCurvatureEstimator
   /**
    * Description of template class 'MongeJetFittingMeanCurvatureEstimator' <p>
-   * \brief Aim: Estimates Mean curvature using CGAL Jet Fitting and Monge Form.
+   * \brief Aim: Estimates Mean curvature using CGAL Jet Fitting and
+   * Monge Form.
+   *
+   * Be carefull, this functor uses a polynomial surface fitting from
+   * point set. Curvature information is given from Monge basis which
+   * could be up to the orientation of the normal vector. Hence, if
+   * the estimated normal @f$ n @f$ is such that @f$ n\cdotn_0>0@f$ with
+   * @f$ n_0@f$ being the true normal at the point set center,
+   * everything is ok.
+   * Otherwise, we have to inverse the princiapl curvature sign: 
+   * @f$ k_1=-k_2@f$ and @f$ k_2= -k_1@f$.
+   *
+   * The mean curvature estimation is thus given up to a sign.
    *
    * model of CLocalEstimatorFromSurfelFunctor
    */
@@ -83,10 +95,11 @@ namespace DGtal
      * Constructor.
      * 
      * @param anEmbedder embedder to map surfel to R^n.
+     * @param h gridstep.
      * @param d degree of the polynomial surface to fit.
      */
-    MongeJetFittingMeanCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder, unsigned int d = 4):
-      myEmbedder(anEmbedder), myD(d) 
+    MongeJetFittingMeanCurvatureEstimator(ConstAlias<SCellEmbedder> anEmbedder, const double h, unsigned int d = 4):
+      myEmbedder(anEmbedder), myH(h), myD(d) 
     {
       VERIFY_MSG(d>=2,"Polynomial surface degree must be greater than 2");
     }
@@ -99,22 +112,20 @@ namespace DGtal
     void pushSurfel(const Surfel & aSurf)
     {
       RealPoint p = myEmbedder->operator()(aSurf);
-      CGALPoint pp(p[0],p[1],p[2]);
+      CGALPoint pp(p[0]*myH,p[1]*myH,p[2]*myH);
       myPoints.push_back(pp);
     }
     
     /** 
      * Evaluate the curvature from Monge form.
      * 
-     * @param h gridstep
-     * 
      * @return the mean curvature
      */    
-    Quantity eval(const double h)
+    Quantity eval()
     {
       CGALMongeForm monge_form;
       CGALMongeViaJet monge_fit;
-      
+             
       monge_form = monge_fit(myPoints.begin() , myPoints.end(), myD, (4<myD)? myD : 4); 
       
       double k1 = monge_form.principal_curvatures ( 0 );
@@ -143,6 +154,8 @@ namespace DGtal
     ///Degree of the polynomial surface to fit
     unsigned int myD;
     
+    ///Grid step
+    double myH;
     
 
   }; // end of class MongeJetFittingMeanCurvatureEstimator

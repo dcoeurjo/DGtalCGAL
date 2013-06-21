@@ -84,10 +84,10 @@ namespace DGtal
      * Constructor.
      * 
      * @param anEmbedder embedder to map surfel to R^n.
-     * @param d degree of the polynomial surface to fit.
+     * @param h gridstep.
      */
-    LinearLeastSquareFittingNormalVectorEstimator(ConstAlias<SCellEmbedder> anEmbedder):
-      myEmbedder(anEmbedder) 
+    LinearLeastSquareFittingNormalVectorEstimator(ConstAlias<SCellEmbedder> anEmbedder, const double h):
+      myEmbedder(anEmbedder), myH(h) 
     {
     }
 
@@ -106,11 +106,9 @@ namespace DGtal
     /** 
      * Evaluate the normal vector from linear least squares fitting.
      * 
-     * @param h gridstep
-     * 
      * @return the mean curvature
      */    
-    Quantity eval(const double h)
+    Quantity eval( )
     {
       CGALPlane plane;
       CGAL::linear_least_squares_fitting_3(myPoints.begin(),myPoints.end(), plane, CGAL::Dimension_tag<0>());
@@ -137,6 +135,8 @@ namespace DGtal
     ///Array of CGAL points
     std::vector<CGALPoint> myPoints;
 
+    ///Grid Step
+    double myH;
     
     
 
